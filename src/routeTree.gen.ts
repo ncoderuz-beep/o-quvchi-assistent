@@ -11,7 +11,11 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as AppRouteImport } from './routes/_app'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AppScoresRouteImport } from './routes/_app.scores'
+import { Route as AppGroupsRouteImport } from './routes/_app.groups'
 import { Route as AppDashboardRouteImport } from './routes/_app.dashboard'
+import { Route as AppAttendanceRouteImport } from './routes/_app.attendance'
+import { Route as AppGroupsGroupIdRouteImport } from './routes/_app.groups.$groupId'
 
 const AppRoute = AppRouteImport.update({
   id: '/_app',
@@ -22,32 +26,84 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AppScoresRoute = AppScoresRouteImport.update({
+  id: '/scores',
+  path: '/scores',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppGroupsRoute = AppGroupsRouteImport.update({
+  id: '/groups',
+  path: '/groups',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppDashboardRoute = AppDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
   getParentRoute: () => AppRoute,
 } as any)
+const AppAttendanceRoute = AppAttendanceRouteImport.update({
+  id: '/attendance',
+  path: '/attendance',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppGroupsGroupIdRoute = AppGroupsGroupIdRouteImport.update({
+  id: '/$groupId',
+  path: '/$groupId',
+  getParentRoute: () => AppGroupsRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/attendance': typeof AppAttendanceRoute
   '/dashboard': typeof AppDashboardRoute
+  '/groups': typeof AppGroupsRouteWithChildren
+  '/scores': typeof AppScoresRoute
+  '/groups/$groupId': typeof AppGroupsGroupIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/attendance': typeof AppAttendanceRoute
   '/dashboard': typeof AppDashboardRoute
+  '/groups': typeof AppGroupsRouteWithChildren
+  '/scores': typeof AppScoresRoute
+  '/groups/$groupId': typeof AppGroupsGroupIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_app': typeof AppRouteWithChildren
+  '/_app/attendance': typeof AppAttendanceRoute
   '/_app/dashboard': typeof AppDashboardRoute
+  '/_app/groups': typeof AppGroupsRouteWithChildren
+  '/_app/scores': typeof AppScoresRoute
+  '/_app/groups/$groupId': typeof AppGroupsGroupIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/dashboard'
+  fullPaths:
+    | '/'
+    | '/attendance'
+    | '/dashboard'
+    | '/groups'
+    | '/scores'
+    | '/groups/$groupId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/dashboard'
-  id: '__root__' | '/' | '/_app' | '/_app/dashboard'
+  to:
+    | '/'
+    | '/attendance'
+    | '/dashboard'
+    | '/groups'
+    | '/scores'
+    | '/groups/$groupId'
+  id:
+    | '__root__'
+    | '/'
+    | '/_app'
+    | '/_app/attendance'
+    | '/_app/dashboard'
+    | '/_app/groups'
+    | '/_app/scores'
+    | '/_app/groups/$groupId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -71,6 +127,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_app/scores': {
+      id: '/_app/scores'
+      path: '/scores'
+      fullPath: '/scores'
+      preLoaderRoute: typeof AppScoresRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/groups': {
+      id: '/_app/groups'
+      path: '/groups'
+      fullPath: '/groups'
+      preLoaderRoute: typeof AppGroupsRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/dashboard': {
       id: '/_app/dashboard'
       path: '/dashboard'
@@ -78,15 +148,47 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppDashboardRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/attendance': {
+      id: '/_app/attendance'
+      path: '/attendance'
+      fullPath: '/attendance'
+      preLoaderRoute: typeof AppAttendanceRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/groups/$groupId': {
+      id: '/_app/groups/$groupId'
+      path: '/$groupId'
+      fullPath: '/groups/$groupId'
+      preLoaderRoute: typeof AppGroupsGroupIdRouteImport
+      parentRoute: typeof AppGroupsRoute
+    }
   }
 }
 
+interface AppGroupsRouteChildren {
+  AppGroupsGroupIdRoute: typeof AppGroupsGroupIdRoute
+}
+
+const AppGroupsRouteChildren: AppGroupsRouteChildren = {
+  AppGroupsGroupIdRoute: AppGroupsGroupIdRoute,
+}
+
+const AppGroupsRouteWithChildren = AppGroupsRoute._addFileChildren(
+  AppGroupsRouteChildren,
+)
+
 interface AppRouteChildren {
+  AppAttendanceRoute: typeof AppAttendanceRoute
   AppDashboardRoute: typeof AppDashboardRoute
+  AppGroupsRoute: typeof AppGroupsRouteWithChildren
+  AppScoresRoute: typeof AppScoresRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
+  AppAttendanceRoute: AppAttendanceRoute,
   AppDashboardRoute: AppDashboardRoute,
+  AppGroupsRoute: AppGroupsRouteWithChildren,
+  AppScoresRoute: AppScoresRoute,
 }
 
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
